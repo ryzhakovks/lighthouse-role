@@ -1,40 +1,65 @@
 Role Name
 =========
 
-Устанавливает LightHouse ищ git-репозитория на Centos 8.
+Роль для установки lighthouse.
+- Устновка Git
+- Скачивание lighthouse из репозитория
+- Конфигурирование lighthouse
+
 
 Requirements
 ------------
 
-Ansible 2.12 и новее 
-Centos 8 
-Установленный nginx
+- Должен быть установлен git. Если его нет, роль произведёт его установку
+- Требуется отдельная установка и настройка Nginx
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+Переменные для установки кредов
+default/main.yml:
+```yaml
+clickhouse_user: netology
+clickhouse_password: netology
+```
+
+Переменные для скачивания lighthouse из git и конфигурационных файлов lighthouse/nginx
+vars/main.yml
+```yaml
+lighthouse_vcs: https://github.com/VKCOM/lighthouse.git
+lighthouse_dir: /var/lib/lighthouse
+lighthouse_access_log_name: lighthouse_access
+```
 
 Dependencies
 ------------
 
-Требуется роль [nginx](https://github.com/Ingvar78/nginx-role.git)
+Требуется роль [clickhouse-role](https://github.com/Valdem88/clickhouse-role)
 
 Example Playbook
 ----------------
 
 Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+```yaml
+hosts: lighthouse
+roles:
+  - role: lighthouse-role
+```
+
+Для вывода строки подключения можно использовать post_tasks
+
+```yaml
+post_tasks:
+  - name: Show connect URL lighthouse
+    debug:
+      msg: "http://{{ ansible_host }}/#http://{{ hostvars['clickhouse-01'].ansible_host }}:8123/?user={{ clickhouse_user }}"
+```
 
 License
 -------
 
-BSD
+MIT
 
 Author Information
 ------------------
-
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
